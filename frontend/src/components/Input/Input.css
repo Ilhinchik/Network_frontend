@@ -1,0 +1,14 @@
+.chat-input {
+  display: flex;
+  height: 3em;
+  position: fixed;
+  bottom: 1em;
+  width: 50%;
+  padding-left: 1em;
+}
+
+.chat--input {
+  background-color: #505051;
+  border: none;
+  border-radius: 0.5em;
+}

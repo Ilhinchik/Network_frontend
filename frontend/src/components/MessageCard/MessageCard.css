@@ -1,0 +1,50 @@
+.msg--container {
+  width: 100%;
+  display: flex;
+}
+
+.msg--own {
+  justify-content: end;
+}
+
+.msg--alien {
+  justify-content: start;
+}
+
+.msg {
+  max-width: 60%;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+}
+
+.msg--own--reverse {
+  align-items: end;
+}
+
+.msg--alien--reverse {
+  align-items: start;
+}
+
+
+.msg--service {
+  display: flex;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+
+.msg--text {
+  width: fit-content;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  display: flex;
+  justify-content: start;
+}
+
+.msg--bg--own {
+  background-color: #1565c0;
+}
+
+.msg--bg--alien {
+  background-color: gray;
+}
