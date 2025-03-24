@@ -29,7 +29,7 @@ function App() {
 
     // обработчик на открытие соединения
     ws.onopen = function () {
-      console.log('WebSocket connection opened');
+      console.log('WebSocket connection opened', ws);
     };
 
     // обработчик на получение сообщения
