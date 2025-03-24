@@ -32,7 +32,7 @@ appMars.use(express.json())
 
 appMars.post('/receive', (req: { body: Message }, res: { sendStatus: (arg0: number) => void }) => {
   const message: Message = req.body
-  //sendMessageToOtherUsers(message.username, message)
+  sendMessageToOtherUsers(message.username, message, 'mars')
   res.sendStatus(200)
   console.log('Received message:', message)
 })
