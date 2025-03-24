@@ -4,9 +4,10 @@ import http from 'http';
 import { WebSocketServer } from 'ws';
 import { WebSocket } from 'ws';
 
-const port: number = 8010; // порт на котором будет развернут этот (вебсокет) сервер
+const portMars: number = 8010;
+const portEarth: number = 8005; // порт на котором будет развернут этот (вебсокет) сервер
 const hostname = 'localhost'; // адрес вебсокет сервера
-const transportLevelPort = 8081; // порт сервера транспортного уровня
+const transportLevelPort = 8080; // порт сервера транспортного уровня
 const transportLevelHostname = 'localhost'; // адрес сервера транспортного уровня
 
 interface Message {
@@ -22,13 +23,14 @@ type Users = Record<string, Array<{
   ws: WebSocket
 }>>
 
-const app = express() // создание экземпляра приложения express
-const server = http.createServer(app) // создание HTTP-сервера
-
+const appEarth = express() // создание экземпляра приложения express
+const serverEarth = http.createServer(appEarth) // создание HTTP-сервера
+const appMars = express(); // Сервер для взаимодействия с транспортным уровнем
+const serverMars = http.createServer(appMars);
 // Используйте express.json() для парсинга JSON тела запроса
-app.use(express.json())
+appMars.use(express.json())
 
-app.post('/receive', (req: { body: Message }, res: { sendStatus: (arg0: number) => void }) => {
+appMars.post('/receive', (req: { body: Message }, res: { sendStatus: (arg0: number) => void }) => {
   const message: Message = req.body
   sendMessageToOtherUsers(message.username, message)
   res.sendStatus(200)
@@ -54,12 +56,16 @@ async function sendToTransportLevel(message: Message): Promise<void> {
 }
 
 // запуск сервера приложения
-server.listen(port, hostname, () => {
-  console.log(`Server started at http://${hostname}:${port}`)
+serverEarth.listen(portEarth, hostname, () => {
+  console.log(`Server started at http://${hostname}:${portEarth}`)
 })
+serverMars.listen(portMars, hostname, () => {
+  console.log(`Mars Transport Level Server started at http://${hostname}:${portMars}`);
+});
 
-const wss = new WebSocketServer({ server })
-const users: Users = {}
+const wssEarth = new WebSocketServer({ server: serverEarth })
+const wssMars = new WebSocketServer({ server: serverMars })
+const users: Users = {} 
 
 function sendMessageToOtherUsers (username: string, message: Message): void {
   const msgString = JSON.stringify(message)
@@ -73,7 +79,17 @@ function sendMessageToOtherUsers (username: string, message: Message): void {
   }
 }
 
-wss.on('connection', (websocketConnection: WebSocket, req: Request) => {
+// Обработчик подключения для Земли
+wssEarth.on('connection', (websocketConnection: WebSocket, req: any) => {
+  handleWebSocketConnection(websocketConnection, req, 'earth')
+})
+
+// Обработчик подключения для Марса
+wssMars.on('connection', (websocketConnection: WebSocket, req: any) => {
+  handleWebSocketConnection(websocketConnection, req, 'mars')
+})
+
+function handleWebSocketConnection(websocketConnection: WebSocket, req: Request, planet: string) {
   if (req.url.length === 0) {
     console.log(`Error: req.url = ${req.url}`)
     return
@@ -84,7 +100,7 @@ wss.on('connection', (websocketConnection: WebSocket, req: Request) => {
   const username = url.searchParams.get('username')
 
   if (username !== null) {
-    console.log(`[open] Connected, username: ${username}`)
+    console.log(`[open] Connected to ${planet}, username: ${username}`)
 
     if (username in users) {
       users[username] = [...users[username], { id: users[username].length, ws: websocketConnection }]
@@ -92,23 +108,64 @@ wss.on('connection', (websocketConnection: WebSocket, req: Request) => {
       users[username] = [{ id: 1, ws: websocketConnection }]
     }
   } else {
-    console.log('[open] Connected')
+    console.log(`[open] Connected to ${planet}`)
   }
 
   console.log('users collection', users)
 
   websocketConnection.on('message', (messageString: string) => {
-    console.log('[message] Received from ' + username + ': ' + messageString)
+    console.log(`[${planet}] [message] Received from ${username}: ${messageString}`)
 
     const message: Message = JSON.parse(messageString)
     message.username = message.username ?? username
-    //sendMessageToOtherUsers(message.username, message)
-    sendToTransportLevel(message); // отправляем на транспортный уровень
+    if (planet === 'earth') {
+      sendToTransportLevel(message); // отправляем на транспортный уровень
+    }
   })
 
   websocketConnection.on('close', (event: any) => {
-    console.log(username, '[close] Соединение прервано', event)
+    console.log(`[${planet}] ${username} [close] Соединение прервано`, event)
 
     delete users.username
   })
-})
+}
+
+// wss.on('connection', (websocketConnection: WebSocket, req: Request) => {
+//   if (req.url.length === 0) {
+//     console.log(`Error: req.url = ${req.url}`)
+//     return
+//   }
+//   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//   // @ts-expect-error
+//   const url = new URL(req?.url, `http://${req.headers.host}`)
+//   const username = url.searchParams.get('username')
+
+//   if (username !== null) {
+//     console.log(`[open] Connected, username: ${username}`)
+
+//     if (username in users) {
+//       users[username] = [...users[username], { id: users[username].length, ws: websocketConnection }]
+//     } else {
+//       users[username] = [{ id: 1, ws: websocketConnection }]
+//     }
+//   } else {
+//     console.log('[open] Connected')
+//   }
+
+//   console.log('users collection', users)
+
+//   websocketConnection.on('message', (messageString: string) => {
+//     console.log('[message] Received from ' + username + ': ' + messageString)
+
+//     const message: Message = JSON.parse(messageString)
+//     message.username = message.username ?? username
+//     sendMessageToOtherUsers(message.username, message)
+//     sendToTransportLevel(message); // отправляем на транспортный уровень
+//   })
+
+//   websocketConnection.on('close', (event: any) => {
+//     console.log(username, '[close] Соединение прервано', event)
+
+//     delete users.username
+//   })
+// })

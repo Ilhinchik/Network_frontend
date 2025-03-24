@@ -7,9 +7,10 @@
 }
 
 .login--card {
-  background-color: #323232;
+  background-color: #FFFFFF;
   width: 25%;
   padding: 5em;
+  border: 1px solid;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
@@ -23,4 +24,10 @@
 .login--header {
   font-size: 2em;
   font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .login--card {
+    width: 50%;
+  }
 }

@@ -15,7 +15,7 @@ function App() {
     if (login) {
       setWs(
         createWebSocket(
-          `ws://${hostname}:8010/?username=${encodeURIComponent(login)}`,
+          `ws://${hostname}:8005/?username=${encodeURIComponent(login)}`,
         ),
       );
     } else {

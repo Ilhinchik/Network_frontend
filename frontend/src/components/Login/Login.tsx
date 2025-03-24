@@ -34,7 +34,7 @@ export const Login: React.FC<LoginProps> = ({ws, setWs, createWebSocket}) => {
     }
     setWs(
       createWebSocket(
-        `ws://${hostname}:8010/?username=${encodeURIComponent(userName)}`,
+        `ws://${hostname}:8005/?username=${encodeURIComponent(userName)}`,
       ),
     );
   };
@@ -53,6 +53,11 @@ export const Login: React.FC<LoginProps> = ({ws, setWs, createWebSocket}) => {
 
           <Button variant="contained"
                   onClick={handleClickSignInBtn}
+                  style={{
+                    backgroundColor: '#005D8C',
+                    margin: 0,
+                    padding: '10px 20px 15px 25px',
+                  }}
           >
             Войти
           </Button>

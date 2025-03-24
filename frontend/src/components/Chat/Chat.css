@@ -1,16 +1,32 @@
 .chat {
-  background-color: #323232;
+  background-color: #ECF3F7;
   height: 100%;
   width: 50%;
 }
 
+.chat-color {
+  background-color: black;
+}
+
 .chat--header {
-  width: 100%;
+  width: 90%;
   padding: 1em;
-  border-bottom: #19191A solid 1px;
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
+  color: black;
+  font-weight: bold;
+  font-size: 1.3em;
+  border-bottom: #19191A solid 8px;
 }
 
 .chat--container {
   overflow-y: auto;
-  height: 85vh;
+  height: calc(100vh - 170px);;
+}
+
+@media (max-width: 768px) {
+  .chat {
+    width: 100%;
+  }
 }
