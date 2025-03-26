@@ -26,7 +26,11 @@ export const Input: React.FC<InputProps> = ({ws, setMessageArray}) => {
   // на кнопку Отправить мы должны посать сообщение по вебсокету
   const handleClickSendMessBtn = () => {
     if (login && ws && message.data !== "") {
-      message.send_time = '2024-02-23T13:45:41Z';
+      const dateUTC = new Date(); // Текущее время в UTC
+      const moscowOffset = 3; // Московское время (UTC+3)
+      dateUTC.setHours(dateUTC.getHours() + moscowOffset);
+      message.send_time = dateUTC.toISOString();
+      // message.send_time = '2024-02-23T13:45:41Z';
       const msgJSON = JSON.stringify(message);
       ws.send(msgJSON);
       setMessageArray((currentMsgArray: any) => [...currentMsgArray, message]);
