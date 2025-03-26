@@ -1,0 +1,98 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Space Communication API",
+      "description": "API for communication between Earth and Mars through WebSocket.",
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+      },
+      "version": "1.0.0",
+      "contact": {
+        "name": "Ilya Markov",
+        "url": "https://github.com/Ilhinchik",
+        "email": "markovila539@gmail.com"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8005",
+        "description": "Earth WebSocket Server"
+      },
+      {
+        "url": "http://localhost:8010",
+        "description": "Mars WebSocket Server"
+      }
+    ],
+    "paths": {
+      "/receive": {
+        "post": {
+          "summary": "API получения сообщения",
+          "description": "Этот API получает сообщения с транспортного уровня",
+          "operationId": "receiveMessage",
+          "tags": [
+            "Message"
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Сообщение получено успешно",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Message": {
+          "type": "object",
+          "required": [
+            "username",
+            "data",
+            "send_time",
+            "error"
+          ],
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "Отправитель сообщения",
+              "example": "Илья Марков"
+            },
+            "data": {
+              "type": "string",
+              "description": "Тело сообщения",
+              "example": "Привет с Земли!"
+            },
+            "send_time": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Время отправки сообщения",
+              "example": "2025-03-26T16:13:54.457Z"
+            },
+            "error": {
+              "type": "string",
+              "description": "Флаг ошибки сообщения",
+              "example": "Невалидный формат"
+            }
+          }
+        }
+      }
+    }
+  }
+  

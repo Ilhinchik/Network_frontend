@@ -3,6 +3,8 @@ import axios from 'axios';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import { WebSocket } from 'ws';
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocument from "./swagger/openapi.json";
 
 const portMars: number = 8010;
 const portEarth: number = 8005; // порт на котором будет развернут этот (вебсокет) сервер
@@ -29,6 +31,9 @@ const appMars = express(); // Сервер для взаимодействия �
 const serverMars = http.createServer(appMars);
 // Используйте express.json() для парсинга JSON тела запроса
 appMars.use(express.json())
+
+appEarth.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+appMars.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 appMars.post('/receive', (req: { body: Message }, res: { sendStatus: (arg0: number) => void }) => {
   const message: Message = req.body
